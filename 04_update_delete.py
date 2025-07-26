@@ -131,6 +131,14 @@ def update_patient(patient_id: str, patient_update : PatientUpdate):
         existing_patient_data[key] = value
     
     #existing_patient_info -> pydantic object -> updated bmi + verdict
+    existing_patient_data['id'] = patient_id
+    patient_pydantic_obj = Patient(**existing_patient_data)   #This will end up calculting new values for BMI and verdict
+    # Pydantic object -> dict 
+    existing_patient_data = patient_pydantic_obj.model_dump(exclude='id')
     
+    # Add this dict to data 
+    data[patient_id] = existing_patient_data
 
+    save_data(data)
 
+    return JSONResponse(status_code=200, content={"message" : "Patient updated successfully"})
