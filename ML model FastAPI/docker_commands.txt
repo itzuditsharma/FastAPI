@@ -1,0 +1,9 @@
+docker build -t itzuditsharma/insurance-premium .
+docker login
+docker push itzuditsharma/insurance-premium
+docker pull itzuditsharma/insurance-premium
+docker run -p 8000:8000 itzuditsharma/insurance-premium
+
+
+To check images :
+docker images
