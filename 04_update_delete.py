@@ -5,7 +5,6 @@ from typing import Annotated, Literal, Optional
 import json
 app = FastAPI()
 
-
 # gt = greater than 
 # lt = lesser than 
 class Patient(BaseModel):
