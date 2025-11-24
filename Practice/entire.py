@@ -31,6 +31,14 @@ class Patient(BaseModel):
             return "Overweight"
         else:
             return "Obese"
+        
+class PatientUpdate(BaseModel):
+    name: Annotated[Optional[str], Field(default = None)]
+    city: Annotated[Optional[str], Field(default = None)]
+    age: Annotated[Optional[int], Field(default=None)]
+    gender: Annotated[Optional[Literal['male', 'female', 'other']], Field(default = None)]
+    height: Annotated[Optional[float], Field(default = None)]
+    weight: Annotated[Optional[float], Field(default = None)]
 
 def load_data():
     with open("../patients.json", 'r') as f:
@@ -66,6 +74,27 @@ def sort_patients(sort_by : str = Query(...,description="Sort based on Height, w
     sorted_data = sorted(data.values(), key = lambda x : x.get(sort_by, 0), reverse = order_flag)
     return sorted_data
 
-@app.create("/create")
+@app.post("/create")
 def create_patient(patient: Patient):
-    pass
+    data = load_data()
+    if patient.id in data:
+        raise HTTPException(status_code=400, detail="User already exists")
+    data[patient.id] = patient.model_dump(exclude=['id'])
+    save_data(data)
+
+    return JSONResponse(status_code=201, content={"message" : "Patient record created successfully"})
+
+@app.put("/edit/{patient_id}")
+def edit_record(patient_id: str, patient_update: PatientUpdate):
+    data = load_data()
+    if patient_id not in data:
+        raise HTTPException(status_code = 400, detail = "User not found")
+    existing_user_record = data[patient_id]
+    updated_patient_record = patient_update.model_dump(exclude_unset=True)
+    for key, value in updated_patient_record.items():
+        existing_user_record[key] = value
+    
+    existing_user_record['id'] = patient_id
+    patient_pydantic_obj = Patient(**existing_user_record)
+
+    existing_user_record =  
