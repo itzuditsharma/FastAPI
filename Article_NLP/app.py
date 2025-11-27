@@ -53,3 +53,36 @@ def get_article(article_id: str):
         raise HTTPException(404, "Article not found")
 
     return articles[article_id]
+
+@app.post("/jobs")
+def create_job(req: JobRequest):
+    articles = load_json(ARTICLES)
+
+    if req.article_id not in articles:
+        raise HTTPException(404, "Invalid Article ID")
+    
+    jobs = load_json(JOBS)
+    results = load_json(RESULTS)
+
+    job_id = str(uuid4())
+    result_id = str(uuid4())
+
+    jobs[job_id] = {
+        'id' : job_id,
+        'article_id': req.article_id,
+        'tasks': req.tasks,
+        'status':"COMPLETED",
+        'result_id': result_id
+    }
+
+    results[result_id] = {
+        "result_id" : result_id,
+        "summary" : "This is a placeholder summary",
+        "sentiment" : "NEUTRAL",
+        "entities": []
+    }
+
+    save_json(JOBS, jobs)
+    save_json(RESULTS, results)
+
+    return {"job_id": job_id, "status": "PROCESSING"}
