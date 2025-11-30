@@ -5,9 +5,9 @@ app = FastAPI()
 
 def send_email(email: str, message: str):
     time.sleep(3)
-    print(f"Email sent successfully to {email} : {message}")
+    print(f"Email sent to {email}: {message}")
 
 @app.post("/notify")
-def notify(email: str, message: str, background_tasks: BackgroundTasks):
-    background_tasks.add_task(send_email, email, message)
-    return {"status" : "Email will be sent in background"}
+def notify(email: str, message: str, background_task: BackgroundTasks):
+    background_task.add_task(send_email, email, message)
+    return {f"Hi, {email} your order is placed."}
